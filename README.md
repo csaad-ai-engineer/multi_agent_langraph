@@ -1,13 +1,30 @@
 # Multi-Agent LangGraph Demo
 
-A multi-agent content generation pipeline built with [LangGraph](https://github.com/langchain-ai/langgraph) and Claude (Haiku). Given a topic, three specialized agents collaborate in a loop to research, write, and review a paragraph until the output is approved.
+A multi-agent content generation pipeline built with [LangGraph](https://github.com/langchain-ai/langgraph). Given a topic, three specialized agents collaborate in a loop to research, write, and review a paragraph until the output is approved.
 
 ## How it works
 
 ```
-researcher → writer → reviewer
-                ↑         |
-                └─────────┘ (if revision needed, max 2 iterations)
+                        ┌─────────────────────────────────────────────────┐
+                        │                  AgentState                     │
+                        │  topic · research · draft · feedback · approved │
+                        └─────────────────────────────────────────────────┘
+
+        ┌───────────────────┐     research     ┌───────────────────┐
+ START ─►                   ├─────────────────►│                   │
+        │    Researcher     │                  │      Writer       │◄──────────┐
+        │                   │                  │                   │           │
+        └───────────────────┘                  └────────┬──────────┘           │
+          Gathers key facts                             │ draft                │
+          about the topic                              ▼                      │
+                                             ┌───────────────────┐  feedback  │
+                                             │                   ├────────────┘
+                                             │     Reviewer      │  (revision requested,
+                                             │                   │   max 2 iterations)
+                                             └────────┬──────────┘
+                                                      │ approved
+                                                      ▼
+                                                    END
 ```
 
 | Agent | Role |
